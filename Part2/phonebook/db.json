@@ -1,9 +1,19 @@
 {
   "persons": [
     {
-      "name": "fdoamo",
-      "number": "486552",
-      "id": "-y24vz009QI"
+      "name": "e",
+      "number": "15",
+      "id": "KiEHs9QOing"
+    },
+    {
+      "name": "fzae",
+      "number": "654",
+      "id": "ilPTvhT_jv8"
+    },
+    {
+      "name": "faed",
+      "number": "4",
+      "id": "IlsFak1BVJw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

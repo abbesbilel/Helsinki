@@ -8,11 +8,11 @@ import phonebookService from './services/phonebook'
 
 const PersonLine = ({ person, removePerson }) => (
   <li>{person.name} {person.number}
-      <button onClick={removePerson}>delete</button>
+    <button onClick={removePerson}>delete</button>
   </li>
 )
 
-const People = ({ persons, removePerson}) => (
+const People = ({ persons, removePerson }) => (
   <ul>
     {persons.map(person => (
       <PersonLine key={person.name} person={person} removePerson={() => removePerson(person.id)} />
@@ -35,11 +35,13 @@ const Form = ({ newName, newNumber, handleChange, handleNumberChange, addPerson 
 const App = () => {
   const [persons, setPersons] = useState([])
 
-    const removePerson = id => {
+  const removePerson = id => {
     const personToRemove = `http://localhost:3001/persons/${id}`
-    phonebookService.remove(personToRemove).then(response => {
-      setPersons(persons.filter(p => p.id !== id))
-    })
+    if (window.confirm("Are you sure you want to delete this person?")) {
+      phonebookService.remove(personToRemove).then(response => {
+        setPersons(persons.filter(p => p.id !== id))
+      })
+    }
   }
 
   useEffect(() => {
@@ -54,9 +56,20 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const nameExists = persons.some(person => person.name === newName);
-    if (nameExists) {
-      alert(`${newName} is already added to phonebook`)
+    const existingPerson = persons.find(
+      person => person.name.toLowerCase() === newName.trim().toLowerCase()
+    )
+    if (existingPerson) {
+      if (window.confirm("this person already exists, do you want to change the number")) {
+        const personObject = { ...existingPerson, number: newNumber }
+        console.log(personObject)
+        phonebookService.update(personObject.id, personObject)
+          .then(response => {
+            setPersons(persons.map(person => person.id === personObject.id ? personObject : person))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
       return
     }
     const personObject = { name: newName, number: newNumber }
