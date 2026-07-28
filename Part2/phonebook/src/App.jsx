@@ -3,7 +3,14 @@ import axios from 'axios'
 import phonebookService from './services/phonebook'
 
 
-
+const Notification = ({ message, state }) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className={state}>{message}</div>
+  )
+}
 
 
 const PersonLine = ({ person, removePerson }) => (
@@ -53,6 +60,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newSearch, setNewSearch] = useState('')
+  const [message, setMessage] = useState(null)
+  const [state, setState] = useState('')
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -66,8 +75,21 @@ const App = () => {
         phonebookService.update(personObject.id, personObject)
           .then(response => {
             setPersons(persons.map(person => person.id === personObject.id ? personObject : person))
+            setState('success')
+            setMessage(`${newName} number was changed successfuly`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
             setNewName('')
             setNewNumber('')
+          })
+          .catch(error => {
+            setMessage(`${newName} was already deleted`)
+            setState('error')
+            setTimeout(() => {
+              setMessage(null)
+              setState(null)
+            }, 5000)
           })
       }
       return
@@ -78,6 +100,12 @@ const App = () => {
         setPersons(persons.concat(response))
         setNewName('')
         setNewNumber('')
+        setMessage(`${newName} was added successfuly`)
+        setState('success')
+        setTimeout(() => {
+          setMessage(null)
+          setState(null)
+        }, 5000)
       }))
   }
 
@@ -100,6 +128,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} state={state} />
       <div>
         filter shown with <input value={newSearch} onChange={handleSearchChange} />
       </div>
