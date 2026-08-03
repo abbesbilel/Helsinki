@@ -43,7 +43,8 @@ const App = () => {
   const [persons, setPersons] = useState([])
 
   const removePerson = id => {
-    const personToRemove = `http://localhost:3001/persons/${id}`
+    const baseUrl = '/api/persons'
+    const personToRemove = `${baseUrl}/${id}`
     if (window.confirm("Are you sure you want to delete this person?")) {
       phonebookService.remove(personToRemove).then(response => {
         setPersons(persons.filter(p => p.id !== id))
