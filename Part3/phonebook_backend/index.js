@@ -26,13 +26,15 @@ app.get('/api/persons', (request, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
-    const count = Person.countDocuments({})
-    const date = new Date()
-    response.send(`
-        <p>Phonebook has info for ${count} people</p>
-        <p>${date}</p>
-        `)
+app.get('/info', (request, response, next) => {
+    Person.countDocuments({})
+        .then(count => {
+            response.send(`
+                <p>Phonebook has info for ${count} people</p>
+                <p>${new Date()}</p>
+            `)
+        })
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
