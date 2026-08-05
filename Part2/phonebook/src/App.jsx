@@ -85,7 +85,8 @@ const App = () => {
             setNewNumber('')
           })
           .catch(error => {
-            setMessage(`${newName} was already deleted`)
+            const errorMessage = error.response?.data?.error || `Information of ${newName} has already been removed from server`
+            setMessage(errorMessage)
             setState('error')
             setTimeout(() => {
               setMessage(null)
@@ -108,6 +109,15 @@ const App = () => {
           setState(null)
         }, 5000)
       }))
+      .catch(error => {
+        console.log(error.response.data.error)
+        setMessage(error.response.data.error)
+        setState('error')
+        setTimeout(() => {
+          setMessage(null)
+          setState(null)
+        }, 5000)
+      })
   }
 
   const handleChange = (event) => {
