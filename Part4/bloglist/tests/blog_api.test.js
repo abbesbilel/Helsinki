@@ -19,12 +19,33 @@ test('number of blogs returned is correct', async () => {
     assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
-test.only('unique identifier property is id', async() => {
+test('unique identifier property is id', async () => {
     const response = await api.get('/api/blogs')
     const blogToCheck = response.body[0]
 
     assert.notStrictEqual(blogToCheck.id, undefined)
     assert.strictEqual(blogToCheck._id, undefined)
+})
+
+test.only('a note is added', async () => {
+    const newBlog = {
+        title: 'thank you for everything',
+        author: 'the gratefull men',
+        url: 'https://alolaàoa.com',
+        likes: 785455555,
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const notesAtEnd = await helper.blogsInDb()
+    assert.strictEqual(notesAtEnd.length, helper.initialBlogs.length + 1)
+
+    const contents = notesAtEnd.map(b => b.title)
+    assert(contents.includes('thank you for everything'))
 })
 
 after(async () => {
