@@ -14,9 +14,17 @@ beforeEach(async () => {
     await Blog.insertMany(helper.initialBlogs)
 })
 
-test.only('number of blogs returned is correct', async () => {
+test('number of blogs returned is correct', async () => {
     const response = await api.get('/api/blogs')
     assert.strictEqual(response.body.length, helper.initialBlogs.length)
+})
+
+test.only('unique identifier property is id', async() => {
+    const response = await api.get('/api/blogs')
+    const blogToCheck = response.body[0]
+
+    assert.notStrictEqual(blogToCheck.id, undefined)
+    assert.strictEqual(blogToCheck._id, undefined)
 })
 
 after(async () => {
