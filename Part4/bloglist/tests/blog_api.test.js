@@ -48,7 +48,7 @@ test('a note is added', async () => {
     assert(contents.includes('thank you for everything'))
 })
 
-test.only('likes property defaults to 0', async() => {
+test('likes property defaults to 0', async() => {
     const newBlog = {
         title: 'thank you for everything',
         author: 'the gratefull men',
@@ -62,6 +62,18 @@ test.only('likes property defaults to 0', async() => {
         .expect('Content-Type', /application\/json/)
 
     assert.strictEqual(response.body.likes, 0)
+})
+
+test.only('400 bad request if title or url are missing', async() => {
+    const newBlog = {
+        author: 'the gratefull men',
+        url: 'https://alolaàoa.com',
+        likes: 785455555,
+    }
+    await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
 
 after(async () => {
