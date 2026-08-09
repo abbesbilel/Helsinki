@@ -27,7 +27,7 @@ test('unique identifier property is id', async () => {
     assert.strictEqual(blogToCheck._id, undefined)
 })
 
-test.only('a note is added', async () => {
+test('a note is added', async () => {
     const newBlog = {
         title: 'thank you for everything',
         author: 'the gratefull men',
@@ -46,6 +46,22 @@ test.only('a note is added', async () => {
 
     const contents = notesAtEnd.map(b => b.title)
     assert(contents.includes('thank you for everything'))
+})
+
+test.only('likes property defaults to 0', async() => {
+    const newBlog = {
+        title: 'thank you for everything',
+        author: 'the gratefull men',
+        url: 'https://alolaàoa.com',
+    }
+
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, 0)
 })
 
 after(async () => {
