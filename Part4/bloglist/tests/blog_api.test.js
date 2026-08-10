@@ -48,7 +48,7 @@ test('a note is added', async () => {
     assert(contents.includes('thank you for everything'))
 })
 
-test('likes property defaults to 0', async() => {
+test('likes property defaults to 0', async () => {
     const newBlog = {
         title: 'thank you for everything',
         author: 'the gratefull men',
@@ -64,16 +64,50 @@ test('likes property defaults to 0', async() => {
     assert.strictEqual(response.body.likes, 0)
 })
 
-test.only('400 bad request if title or url are missing', async() => {
+test('400 bad request if title or url are missing', async () => {
     const newBlog = {
         author: 'the gratefull men',
         url: 'https://alolaàoa.com',
         likes: 785455555,
     }
     await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+})
+
+test('deleting a blog', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+})
+
+test.only('updating a blog', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+
+    const updatedBlog = {
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1,
+    }
+
+    const response = await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(updatedBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, blogToUpdate.likes + 1)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const updatedBlogInDb = blogsAtEnd.find((b) => b.id === blogToUpdate.id)
+    assert.strictEqual(updatedBlogInDb.likes, blogToUpdate.likes + 1)
 })
 
 after(async () => {
