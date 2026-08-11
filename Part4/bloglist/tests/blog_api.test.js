@@ -88,7 +88,7 @@ test('deleting a blog', async () => {
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
 })
 
-test.only('updating a blog', async () => {
+test('updating a blog', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
 
