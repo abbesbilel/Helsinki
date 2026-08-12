@@ -13,7 +13,7 @@ beforeEach(async () => {
     await User.insertMany(helper.initialUsers)
 })
 
-test.only('invalid password users are not created', async () => {
+test('invalid password users are not created', async () => {
     const usersAtStart = await helper.usersInDb()
     const invalidUser = {
         username: 'validuser',

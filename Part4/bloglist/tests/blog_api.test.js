@@ -1,17 +1,33 @@
 const assert = require('node:assert')
-const { test, after, beforeEach } = require('node:test')
-const mongoose = require('mongoose')
 const supertest = require('supertest')
+const mongoose = require('mongoose')
+const helper = require('./test_helper')
 const app = require('../app')
+const api = supertest(app)
+const { test, after, beforeEach } = require('node:test')
 
 const Blog = require('../models/blog')
-const helper = require('./test_helper')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
-const api = supertest(app)
+let token = null
 
 beforeEach(async () => {
-    await Blog.deleteMany({})
-    await Blog.insertMany(helper.initialBlogs)
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash('secretpassword', 10)
+  const user = new User({ username: 'root', name: 'Superuser', passwordHash })
+  await user.save()
+
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'secretpassword' })
+
+  token = loginResponse.body.token
+
+  await Blog.deleteMany({})
+  const blogObjects = helper.initialBlogs.map(blog => new Blog({ ...blog, user: user._id }))
+  const promiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(promiseArray)
 })
 
 test('number of blogs returned is correct', async () => {
@@ -37,6 +53,7 @@ test('a note is added', async () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -48,6 +65,19 @@ test('a note is added', async () => {
     assert(contents.includes('thank you for everything'))
 })
 
+test('fails with status code 401 if token is not provided', async () => {
+    const newBlog = {
+      title: 'Unauthorized Blog',
+      author: 'Anonymous',
+      url: 'http://example.com',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+  })
+
 test('likes property defaults to 0', async () => {
     const newBlog = {
         title: 'thank you for everything',
@@ -57,6 +87,7 @@ test('likes property defaults to 0', async () => {
 
     const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -72,6 +103,7 @@ test('400 bad request if title or url are missing', async () => {
     }
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400)
 })
@@ -82,6 +114,7 @@ test('deleting a blog', async () => {
 
     await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
