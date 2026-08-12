@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkJsb2dnZXIiLCJpZCI6IjZhN2I2OGY4MjhkMWJiYTNmYmE0ODVkMSIsImlhdCI6MTc4NjQ4MTE1NSwiZXhwIjoxNzg2NDg0NzU1fQ.2mLL3kVBRAz6LcYcaLt9XcPvbZcIPKONw6elVlrP9jg
 
 {
-    "title": "i'm bilel",
-    "author": "suiiiiiiii",
-    "url": "htaoaooooooo",
-    "likes": 1
+    "title": "i love home",
+    "author": "ronaldo",
+    "url": "http",
+    "likes": 17
 }
